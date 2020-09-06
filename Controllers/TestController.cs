@@ -16,12 +16,31 @@ namespace JwtHelperDemo.Controllers
         public AjaxResult t1() { 
             return new AjaxResult { 
                 success =true,
-                data = JWT.JwtHelper.CreateJWT(new { a=123,b=456})
+                data = JWT.JwtHelper.Create(new { a=123,b=456})
             }; 
         }
+        [HttpGet]
+        public AjaxResult t2(string token)
+        {
+            return new AjaxResult
+            {
+                success = true,
+                data = JWT.JwtHelper.Verify(token)
+            };
+        }
+        [HttpGet]
+        public AjaxResult t3(string token)
+        {
+            return new AjaxResult
+            {
+                success = true,
+                data = JWT.JwtHelper.Decode<Dictionary<string,int>>(token)
+            };
+        }
+
 
         [HttpGet]
-        public AjaxResult t2(int i=1) {
+        public AjaxResult test(int i=1) {
             int s = 100 / i;
             return new AjaxResult {success = true,data = s };
         }

@@ -37,7 +37,7 @@ namespace JWT
         /// 生成 Json Web Token
         /// </summary>
         /// <returns></returns>
-        public static string CreateJWT(object payloadObj, string secret = null)
+        public static string Create(object payloadObj, string secret = null)
         {
             /*
              payload 标准中注册的声明 (建议但不强制使用) ：
@@ -61,41 +61,13 @@ namespace JWT
 
             return string.Format(@"{0}.{1}.{2}", header, payload, signature);
         }
-        /// <summary>
-        /// 生成 Json Web Token
-        /// </summary>
-        /// <returns></returns>
-        public static string CreateJwtDictionary(Dictionary<string, object> payloadDIC)
-        {
-            return CreateJWT(payloadDIC);
-        }
+        
         /// <summary>
         /// Json Web Token 签名验证 
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static bool VerifyJwtSignature(string token, string secret = null)
-        {
-            if (string.IsNullOrEmpty(token))
-            {
-                return false;
-            }
-
-            var split = token.Split('.');
-            if (split.Length != 3)
-            {
-                return false;
-            }
-
-            string signature = Base64.EncodeUrl(HS256(split[0], split[1], string.IsNullOrEmpty(secret) ? JwtSecret : secret));
-            return signature == split[2];
-        }
-        /// <summary>
-        /// 验证 Json Web Token
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public static bool VerifyJWT(string token,string secret = null)
+        public static bool Verify(string token, string secret = null)
         {
             if (string.IsNullOrEmpty(token))
             {
@@ -113,11 +85,11 @@ namespace JWT
         }
 
         /// <summary>
-        /// 
+        /// JWT 解码
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static T DecodeJWT<T>(string token, string secret = null) where T : class, new()
+        public static T Decode<T>(string token) where T : class, new()
         {
             if (string.IsNullOrEmpty(token))
             {
@@ -129,42 +101,8 @@ namespace JWT
             {
                 return default(T);
             }
-
-            string signature = Base64.EncodeUrl(HS256(split[0], split[1], string.IsNullOrEmpty(secret) ? JwtSecret : secret));
-            return signature == split[2] ? Json.Deserialize<T>(Base64.DecodeUrl(split[1])) : default(T);
+            return Json.Deserialize<T>(Base64.DecodeUrl(split[1]));
         }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public static Dictionary<string, object> DecodeJwtDictionary(string token,string secret=null)
-        {
-            if (string.IsNullOrEmpty(token))
-            {
-                return null;
-            }
-
-            var split = token.Split('.');
-            if (split.Length != 3)
-            {
-                return null;
-            }
-
-            string signature = Base64.EncodeUrl(HS256(split[0], split[1], string.IsNullOrEmpty(secret) ? JwtSecret : secret));
-            return signature == split[2] ? Json.Deserialize<Dictionary<string, object>>(Base64.DecodeUrl(split[1])) : null;
-        }
-
-
-
-
-
-
-
-
-
 
 
     }
